@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CustomParseIntPipe } from 'src/common/pipes/custom-parse-int-pipe.pipe';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
@@ -30,11 +32,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOne(@Param('id', CustomParseIntPipe) id: number) {
-    // console.log(process.env.TESTE);
-    // console.log(this.configService.getOrThrow('TESTE'));
-    return this.userService.findOne(+id);
+    // return this.userService.findOne(id);
+    return 'User found';
   }
 
   @Patch(':id')

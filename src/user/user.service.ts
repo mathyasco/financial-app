@@ -12,7 +12,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly hashingService: HashingService,
-  ) { }
+  ) {}
 
   async create(dto: CreateUserDto) {
     const user = await this.userRepository.exists({
@@ -36,12 +36,16 @@ export class UserService {
     return created;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  findByEmail(email: string) {
+    return this.userRepository.findOneBy({ email });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findById(id: string) {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  findAll() {
+    return `This action returns all user`;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
