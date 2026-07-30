@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
@@ -14,16 +19,28 @@ export class UserService {
     private readonly hashingService: HashingService,
   ) {}
 
-  async create(dto: CreateUserDto) {
-    const user = await this.userRepository.exists({
-      where: {
-        email: dto.email,
-      },
+  async findOneByOrFail(userData: Partial<User>) {
+    const user = await this.userRepository.findOneBy(userData);
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
+  }
+
+  async failIfEmailExists(email: string) {
+    const exists = await this.userRepository.existsBy({
+      email,
     });
 
-    if (user) {
+    if (exists) {
       throw new ConflictException('E-mail já existe');
     }
+  }
+
+  async create(dto: CreateUserDto) {
+    await this.failIfEmailExists(dto.email);
 
     const hashedPassword = await this.hashingService.hash(dto.password);
     const newUser = {
@@ -44,15 +61,33 @@ export class UserService {
     return this.userRepository.findOneBy({ id });
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async update(id: string, dto: UpdateUserDto) {
+    if (!dto.name && !dto.email) {
+      throw new BadRequestException('Dados não enviados');
+    }
+
+    const user = await this.findOneByOrFail({ id });
+
+    user.name = dto.name ?? user.name;
+
+    if (dto.email && dto.email !== user.email) {
+      await this.failIfEmailExists(dto.email);
+      user.email = dto.email;
+      user.forceLogout = true;
+    }
+
+    return this.save(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  save(user: User) {
+    return this.userRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  // findAll() {
+  //   return `This action returns all user`;
+  // }
+
+  // remove(id: number) {
+  //   return `This action removes a #${id} user`;
+  // }
 }
