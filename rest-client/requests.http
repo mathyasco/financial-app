@@ -8,8 +8,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "matheus@gmail.com",
-    "password":"1234"
+    "email": "maria@gmail.com",
+    "password":"123456"
 }
 
 ### Read one user
@@ -27,7 +27,7 @@ Content-Type: application/json
 {
     "name": "Maria",
     "email": "maria@gmail.com",
-    "password":"1234"
+    "password":"123456"
 }
 
 ### Update user
@@ -41,3 +41,28 @@ Authorization: Bearer {{jwtToken}}
     "name": "Matheus",
     "email": "matheus@gmail.com"
 }
+
+### Update user password
+# @name updateUserPassword
+
+PATCH {{baseUrl}}/user/me/password
+Content-Type: application/json
+Authorization: Bearer {{jwtToken}}
+
+{
+    "currentPassword": "123456",
+    "newPassword": "123456"
+}
+
+### Read one user
+# @name readUser
+
+GET {{baseUrl}}/user/me
+Authorization: Bearer {{jwtToken}}
+
+
+### Delete one user
+# @name deleteUser
+
+DELETE {{baseUrl}}/user/me
+Authorization: Bearer {{jwtToken}}
