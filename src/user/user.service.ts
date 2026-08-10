@@ -12,7 +12,6 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingService } from 'src/common/hashing/hashing.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -109,12 +108,4 @@ export class UserService {
   save(user: User) {
     return this.userRepository.save(user);
   }
-
-  // findAll() {
-  //   return `This action returns all user`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
 }
